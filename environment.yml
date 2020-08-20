@@ -1,0 +1,18 @@
+name: biomedical
+channels:
+  - conda-forge
+  - anaconda
+  - defaults
+dependencies:
+  - gensim=3.8.0
+  - jupyter=1.0.0
+  - matplotlib=3.2.2
+  - nltk=3.5
+  - pandas=1.1.0
+  - pip=20.2.1
+  - pyldavis=2.1.2
+  - python=3.6.10
+  - spacy=2.3.2
+  - pip:
+    - en-core-web-sm==2.3.1
+    - xlrd==1.2.0
