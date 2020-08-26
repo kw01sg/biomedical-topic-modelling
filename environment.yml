@@ -13,6 +13,7 @@ dependencies:
   - pyldavis=2.1.2
   - python=3.6.10
   - spacy=2.3.2
+  - openpyxl=3.0.4
   - pip:
     - en-core-web-sm==2.3.1
     - xlrd==1.2.0
