@@ -68,6 +68,7 @@ def get_topics_distribution(formatted_df: pd.DataFrame):
 def get_term_topics(model: LdaModel, dictionary: Dictionary, term: str):
     if term in dictionary.token2id:
         return model.get_term_topics(dictionary.token2id[term])
+    return None
 
 
 def format_term_search_results(model: LdaModel, search_results: dict):
@@ -81,4 +82,12 @@ def format_term_search_results(model: LdaModel, search_results: dict):
             topic_keywords = ", ".join([word for word, prop in wp])
             temp_list.append([key, topic_id, topic_prob, topic_keywords])
 
-    return pd.DataFrame(temp_list, columns=['Search_Term', 'Topic_ID', 'Topic_Prob', 'Topic_Keywords'])
+    return pd.DataFrame(temp_list,
+                        columns=['Search_Term', 'Topic_ID', 'Topic_Prob', 'Topic_Keywords'])
+
+
+def get_all_topics(model: LdaModel):
+    results = []
+    for topic in model.show_topics(-1, formatted=False):
+        results.append([topic[0], ", ".join([word[0] for word in topic[1]])])
+    return pd.DataFrame(results, columns=['Topic_Id', 'Topic_Keywords'])

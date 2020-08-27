@@ -1,7 +1,7 @@
 from pathlib import Path
-import pickle
-from gensim.corpora import Dictionary
+
 from gensim.models import LdaModel
+from gensim.models.wrappers import LdaMallet
 
 
 def save_model(model: LdaModel, path='../artefacts/model', suffix=''):
@@ -16,9 +16,12 @@ def load_model(artefacts_path='../artefacts', suffix=''):
     if suffix:
         model_path = model_path + f'_{suffix}'
     model = LdaModel.load(model_path)
-    # dictionary = Dictionary.load(str(Path(artefacts_path) / 'dictionary'))
-    # with open(Path(artefacts_path) / 'corpus.pkl', 'rb') as f:
-    #     corpus = pickle.load(f)
+    return model
 
-    # return {'model': model, 'dictionary': dictionary, 'corpus': corpus}
+
+def load_mallet_model(artefacts_path='./artefacts', suffix=''):
+    model_path = str(Path(artefacts_path) / 'model')
+    if suffix:
+        model_path = model_path + f'_{suffix}'
+    model = LdaMallet.load(model_path)
     return model

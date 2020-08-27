@@ -1,15 +1,17 @@
 import time
-import logging
+from pathlib import Path
 
 import click
 import pandas as pd
-from pathlib import Path
 
 from gensim.models import LdaModel, LdaMulticore
+from gensim.models.wrappers import LdaMallet
 from src.process_data import process_data
 from src.gensim_helper import create_dictionary, get_coherence
 from src.artefacts_helper import save_model
 
+
+MALLET_PATH = './mallet-2.0.8/bin/mallet'
 
 # Set training parameters.
 CHUNK_SIZE = 4000
@@ -69,6 +71,20 @@ def train_lda_multi_core(corpus, id2word, num_topics, params: dict):
     )
 
 
+def train_lda_mallet(corpus, id2word, num_topics, params: dict):
+    iterations = params.get('iterations', ITERATIONS)
+    alpha = params.get('alpha', 50/num_topics)
+    random_state = params.get('random_state', RANDOM_STATE)
+
+    return LdaMallet(mallet_path=MALLET_PATH,
+                     corpus=corpus,
+                     id2word=id2word,
+                     num_topics=num_topics,
+                     alpha=alpha,
+                     iterations=iterations,
+                     random_seed=random_state)
+
+
 @click.command()
 @click.option('-i', '--input', 'input_path', required=True, type=str)
 @click.option('-n', '--num_topics', required=True, type=int)
@@ -87,7 +103,8 @@ def train(input_path, num_topics, model_suffix, save_model_flag):
     corpus = [dictionary.doc2bow(doc) for doc in docs]
 
     start = time.time()
-    model = train_lda_multi_core(corpus, dictionary, num_topics, params={})
+    model = train_lda_mallet(
+        corpus, dictionary, num_topics, params={'alpha': 50})
     training_time = time.time() - start
     training_time = time.strftime('%Hh:%Mm:%Ss', time.gmtime(training_time))
     print(f'Training time: {training_time}')
@@ -96,6 +113,7 @@ def train(input_path, num_topics, model_suffix, save_model_flag):
 
     if save_model_flag:
         save_model(model, suffix=model_suffix, path='./artefacts/model')
+
     print('training completed')
 
 
