@@ -12,6 +12,8 @@ from src.artefacts_helper import save_model
 
 
 MALLET_PATH = './mallet-2.0.8/bin/mallet'
+PREFIX_BASE_PATH = 'mallet_tmp'
+ARTEFACTS_PATH = './artefacts/model'
 
 # Set training parameters.
 CHUNK_SIZE = 4000
@@ -72,11 +74,19 @@ def train_lda_multi_core(corpus, id2word, num_topics, params: dict):
 
 
 def train_lda_mallet(corpus, id2word, num_topics, params: dict):
+    mallet_path = params.get('mallet_path', MALLET_PATH)
+    prefix_path = params.get('prefix_path', str(
+        Path(ARTEFACTS_PATH) / PREFIX_BASE_PATH))
+    prefix = params.get('prefix', '')
+    if prefix:
+        prefix = prefix + '_'
+    prefix = str(Path(prefix_path) / prefix)
     iterations = params.get('iterations', ITERATIONS)
-    alpha = params.get('alpha', 50/num_topics)
+    alpha = params.get('alpha', 50)
     random_state = params.get('random_state', RANDOM_STATE)
 
-    return LdaMallet(mallet_path=MALLET_PATH,
+    return LdaMallet(mallet_path=mallet_path,
+                     prefix=prefix,
                      corpus=corpus,
                      id2word=id2word,
                      num_topics=num_topics,
@@ -103,8 +113,8 @@ def train(input_path, num_topics, model_suffix, save_model_flag):
     corpus = [dictionary.doc2bow(doc) for doc in docs]
 
     start = time.time()
-    model = train_lda_mallet(
-        corpus, dictionary, num_topics, params={'alpha': 50})
+    model = train_lda_mallet(corpus, dictionary,
+                             num_topics, {'prefix': model_suffix})
     training_time = time.time() - start
     training_time = time.strftime('%Hh:%Mm:%Ss', time.gmtime(training_time))
     print(f'Training time: {training_time}')
@@ -112,7 +122,7 @@ def train(input_path, num_topics, model_suffix, save_model_flag):
     print(f'Coherence Score: {coherence_score}')
 
     if save_model_flag:
-        save_model(model, suffix=model_suffix, path='./artefacts/model')
+        save_model(model, suffix=model_suffix, path=ARTEFACTS_PATH)
 
     print('training completed')
 

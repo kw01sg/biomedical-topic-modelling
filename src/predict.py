@@ -1,27 +1,35 @@
 import pandas as pd
+import numpy as np
+
 from gensim.models import LdaModel
 from gensim.corpora import Dictionary
 
 
-def predict_and_format_topics(ldamodel: LdaModel, corpus, texts):
+def predict_and_format_topics(ldamodel: LdaModel, corpus, texts, doc_id=[], n_topics=5):
     df = pd.DataFrame()
 
     # Get main topic in each document
     for row in ldamodel[corpus]:
         row = sorted(row, key=lambda x: (x[1]), reverse=True)
 
-        # Get the Dominant topic, Topic Probability and Keywords for each document
-        topic_num, prob_topic = row[0]
-        wp = ldamodel.show_topic(topic_num)
-        topic_keywords = ", ".join([word for word, prop in wp])
-        df = df.append(pd.Series(
-            [int(topic_num), round(prob_topic, 4), topic_keywords]), ignore_index=True)
+        # Get the top n topic and topic probability for each document
+        temp_list = []
+        for topic_num, prob_topic in row[:n_topics]:
+            wp = ldamodel.show_topic(topic_num)
+            topic_keywords = ", ".join([word for word, prop in wp])
+            temp_list = temp_list + \
+                [int(topic_num), round(prob_topic, 4), topic_keywords]
+        df = df.append(pd.Series(temp_list), ignore_index=True)
 
     # Add original text to the end of the output
-    df = pd.concat([df, pd.Series(texts)], axis=1)
-    df.reset_index(inplace=True)
-    df.columns = ['Document_No', 'Dominant_Topic',
-                  'Topic_Prob', 'Topic_Keywords', 'Text']
+    # df = pd.concat([df, pd.Series(texts)], axis=1)
+    if doc_id:
+        df.insert(0, 'Document_No', doc_id)
+    else:
+        df.reset_index(inplace=True)
+
+    df.columns = ['Document_No'] + np.array(
+        [(f'Dominant_Topic_{i+1}', f'Topic_Prob_{i+1}', 'Topic Keywords') for i in range(n_topics)]).flatten().tolist()
 
     return df
 
@@ -86,8 +94,8 @@ def format_term_search_results(model: LdaModel, search_results: dict):
                         columns=['Search_Term', 'Topic_ID', 'Topic_Prob', 'Topic_Keywords'])
 
 
-def get_all_topics(model: LdaModel):
+def get_all_topics(model: LdaModel, num_words=10):
     results = []
-    for topic in model.show_topics(-1, formatted=False):
+    for topic in model.show_topics(-1, num_words=num_words, formatted=False):
         results.append([topic[0], ", ".join([word[0] for word in topic[1]])])
     return pd.DataFrame(results, columns=['Topic_Id', 'Topic_Keywords'])
