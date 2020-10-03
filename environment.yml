@@ -14,6 +14,7 @@ dependencies:
   - python=3.6.10
   - spacy=2.3.2
   - openpyxl=3.0.4
+  - jupyter_contrib_nbextensions=0.5.1
   - pip:
     - https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-2.3.1/en_core_web_sm-2.3.1.tar.gz
     - xlrd==1.2.0
