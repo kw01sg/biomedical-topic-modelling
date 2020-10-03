@@ -15,5 +15,5 @@ dependencies:
   - spacy=2.3.2
   - openpyxl=3.0.4
   - pip:
-    - en-core-web-sm==2.3.1
+    - https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-2.3.1/en_core_web_sm-2.3.1.tar.gz
     - xlrd==1.2.0
