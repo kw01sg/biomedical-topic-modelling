@@ -136,3 +136,9 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
+
+artefacts/
+references/
+output/
+
+mallet-2.0.8/
