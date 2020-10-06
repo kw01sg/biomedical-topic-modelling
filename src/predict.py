@@ -1,8 +1,7 @@
-import pandas as pd
 import numpy as np
-
-from gensim.models import LdaModel
+import pandas as pd
 from gensim.corpora import Dictionary
+from gensim.models import LdaModel
 
 
 def predict_and_format_topics(ldamodel: LdaModel, corpus, texts, doc_id=[], n_topics=5):
@@ -52,25 +51,25 @@ def get_topic_most_dominant_document(formatted_df: pd.DataFrame):
     return df
 
 
-def get_topics_distribution(formatted_df: pd.DataFrame):
-    # Number of Documents for Each Topic
-    topic_counts = formatted_df['Dominant_Topic'].value_counts()
+def get_topics_distribution(ldamodel: LdaModel, formatted_df: pd.DataFrame, n_topics=1):
+    dist_array = np.zeros((ldamodel.num_topics, n_topics))
 
-    # Percentage of Documents for Each Topic
-    topic_contribution = round(topic_counts/topic_counts.sum(), 4)
+    for i in range(n_topics):
+        # Number of Documents for Each Topic
+        for topic_id, topic_count in formatted_df[f'Dominant_Topic_{i+1}'].value_counts().iteritems():
+            if i == 0:
+                dist_array[int(topic_id)][i] = int(topic_count)
+            else:
+                dist_array[int(topic_id)][i] = int(
+                    topic_count) + dist_array[int(topic_id)][i-1]
 
     # Topic Number and Keywords
-    df = formatted_df[['Dominant_Topic', 'Topic_Keywords']
-                      ].sort_values('Dominant_Topic').drop_duplicates()
-    df.set_index('Dominant_Topic', inplace=True)
+    df = get_all_topics(ldamodel)
 
-    # Concatenate Column wise
-    df['Num_Documents'] = topic_counts
-    df['Perc_Documents'] = topic_contribution
+    temp_df = pd.DataFrame(dist_array, columns=[
+                           f"top_{i+1}_topics" for i in range(n_topics)])
 
-    df.reset_index(inplace=True)
-
-    return df
+    return df.merge(temp_df, left_index=True, right_index=True)
 
 
 def get_term_topics(model: LdaModel, dictionary: Dictionary, term: str):
