@@ -5,6 +5,7 @@ from gensim.models import LdaModel
 
 
 def predict_and_format_topics(ldamodel: LdaModel, corpus, texts, doc_id=[], n_topics=5):
+    """TODO: Refactor code to optimize prediction speed"""
     df = pd.DataFrame()
 
     # Get main topic in each document
