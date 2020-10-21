@@ -4,8 +4,13 @@ from gensim.corpora import Dictionary
 from gensim.models import LdaModel
 
 
-def predict_and_format_topics(ldamodel: LdaModel, corpus, texts, doc_id=[], n_topics=5):
-    """TODO: Refactor code to optimize prediction speed"""
+def predict_and_format_topics(ldamodel: LdaModel, corpus, texts, doc_id: list = None, n_topics=5):
+    """Predict top n topics of corpus and format results in a pandas DataFrame
+    DataFrame has the following columns:
+    'Document_No' and 'Topic_Id', 'Topic_Prob' and'Topic Keywords' for each n topics
+
+    TODO: Refactor code to optimize prediction speed
+    """
     df = pd.DataFrame()
 
     # Get main topic in each document
@@ -22,6 +27,8 @@ def predict_and_format_topics(ldamodel: LdaModel, corpus, texts, doc_id=[], n_to
         df = df.append(pd.Series(temp_list), ignore_index=True)
 
     # Add original text to the end of the output
+    # Code commented out for backward compatibility.
+    # Uncomment below line to enable concat of original text
     # df = pd.concat([df, pd.Series(texts)], axis=1)
     if doc_id:
         df.insert(0, 'Document_No', doc_id)
@@ -29,7 +36,8 @@ def predict_and_format_topics(ldamodel: LdaModel, corpus, texts, doc_id=[], n_to
         df.reset_index(inplace=True)
 
     df.columns = ['Document_No'] + np.array(
-        [(f'Dominant_Topic_{i+1}', f'Topic_Prob_{i+1}', 'Topic Keywords') for i in range(n_topics)]).flatten().tolist()
+        [(f'Dominant_Topic_{i+1}', f'Topic_Prob_{i+1}', 'Topic Keywords')
+            for i in range(n_topics)]).flatten().tolist()
 
     return df
 
@@ -57,7 +65,8 @@ def get_topics_distribution(ldamodel: LdaModel, formatted_df: pd.DataFrame, n_to
 
     for i in range(n_topics):
         # Number of Documents for Each Topic
-        for topic_id, topic_count in formatted_df[f'Dominant_Topic_{i+1}'].value_counts().iteritems():
+        items = formatted_df[f'Dominant_Topic_{i+1}'].value_counts().iteritems()
+        for topic_id, topic_count in items:
             if i == 0:
                 dist_array[int(topic_id)][i] = int(topic_count)
             else:

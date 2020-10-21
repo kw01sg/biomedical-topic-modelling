@@ -1,7 +1,7 @@
-import gensim
-from nltk.stem.wordnet import WordNetLemmatizer
-from nltk.corpus import stopwords
 import nltk
+from nltk.corpus import stopwords
+from nltk.stem.wordnet import WordNetLemmatizer
+
 nltk.download('wordnet')
 nltk.download('stopwords')
 
@@ -10,6 +10,8 @@ stop_words = stopwords.words('english')
 
 
 def tokenize(data: list):
+    """Simple Word Tokenizer using nltk
+    """
     tokenizer = nltk.RegexpTokenizer(r"\w+")
     return [tokenizer.tokenize(i) for i in data]
 

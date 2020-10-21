@@ -1,8 +1,8 @@
 from pathlib import Path
 
-from gensim.corpora import Dictionary
 import pyLDAvis
 import pyLDAvis.gensim
+from gensim.corpora import Dictionary
 
 
 def generate_ldavis(model, corpus, dictionary: Dictionary, file_name: str, path='../references'):

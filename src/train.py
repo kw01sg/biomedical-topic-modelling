@@ -3,17 +3,16 @@ from pathlib import Path
 
 import click
 import pandas as pd
-
 from gensim.models import LdaModel, LdaMulticore
 from gensim.models.wrappers import LdaMallet
-from src.process_data import process_data
-from src.gensim_helper import create_dictionary, get_coherence
-from src.artefacts_helper import save_model
 
+from src.artefacts_helper import save_model
+from src.gensim_helper import create_dictionary, get_coherence
+from src.process_data import process_data
 
 MALLET_PATH = './mallet-2.0.8/bin/mallet'
 PREFIX_BASE_PATH = 'mallet_tmp'
-ARTEFACTS_PATH = './artefacts/model'
+ARTEFACTS_PATH = './artefacts'
 
 # Set training parameters.
 CHUNK_SIZE = 4000
@@ -122,7 +121,8 @@ def train(input_path, num_topics, model_suffix, save_model_flag):
     print(f'Coherence Score: {coherence_score}')
 
     if save_model_flag:
-        save_model(model, suffix=model_suffix, path=ARTEFACTS_PATH)
+        save_model(model, suffix=model_suffix,
+                   path=str(Path(ARTEFACTS_PATH) / 'model'))
 
     print('training completed')
 

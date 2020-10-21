@@ -3,6 +3,8 @@ from gensim.models import CoherenceModel
 
 
 def create_dictionary(docs: list, filter_extreme=True):
+    """Helper function to create a Gensim Dictionary object
+    """
     # Create a dictionary representation of the documents.
     dictionary = Dictionary(docs)
 

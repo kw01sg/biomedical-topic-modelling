@@ -5,6 +5,8 @@ from gensim.models.wrappers import LdaMallet
 
 
 def save_model(model: LdaModel, path='../artefacts/model', suffix=''):
+    """Helper function to save Gensim LdaModel at specified path
+    """
     if suffix:
         path = path + '_' + suffix
     model.save(path)
