@@ -9,15 +9,13 @@ biomedical-topic-modelling
 │   ├── Associated words.xlsx
 │   ├── cordis-h2020projects.xlsx                   <- list of projects/grants
 │   ├── Text mining word list test 200823.xlsx
-│   └── topics_300_SYinput_LW.csv
+│   └── topics_300_SYinput_LW.csv                   <- manual labels topics from baseline topic model
 ├── mallet-2.0.8    <- executable for LDA Mallet. Refer to Topic Modeling with Gensim (Python) in Reference
 ├── notebooks
-│   ├── bigrams.ipynb
-│   ├── EDA.ipynb
-│   ├── filter_dataset.ipynb
-│   ├── LDA.ipynb
-│   ├── Top2Vec.ipynb
-│   └── validate_topics.ipynb
+│   ├── 1_EDA.ipynb
+│   ├── 2_LDA.ipynb
+│   ├── 3_filter_dataset.ipynb
+│   └── 4_validate_topics.ipynb
 ├── output
 ├── references
 ├── src
@@ -31,6 +29,11 @@ biomedical-topic-modelling
 ├── environment.yml
 └── README.md
 ```
+
+## Data
+
+* `cordis-h2020projects.xlsx` contains list of projects/grants with `title` and `objective` fields that are used for topic modelling
+* `topics_300_SYinput_LW.csv` contains manual labels of relevant and irrelevant topics generated from baseline topic model. Labels are used in `notebooks/3. filter_dataset.ipynb` to filter `cordis-h2020projects.xlsx`.
 
 ## Getting Started
 
@@ -77,8 +80,40 @@ $ python -m src.train --input ./data/cordis-h2020projects.xlsx --num_topics 10 -
 from src.artefacts_helper import load_mallet_model
 
 model = load_mallet_model(artefacts_path='./artefacts/', suffix='temp')
-model.num_topics
 ```
+
+### General Usage
+
+```python
+import pandas as pd
+from src.gensim_helper import create_dictionary
+from src.predict import predict_and_format_topics
+from src.process_data import process_data
+from src.train import train_lda_mallet
+
+sheets_dict = pd.read_excel('./data/cordis-h2020projects.xlsx', None)
+df = sheets_dict['cordis-h2020projects']
+
+# combine title and objective
+data = (df['title'] + ' ' + df['objective']).values.tolist()
+
+docs = process_data(data)
+dictionary = create_dictionary(docs)
+corpus = [dictionary.doc2bow(doc) for doc in docs]
+model = train_lda_mallet(corpus, dictionary, 10,
+                         params={
+                             'mallet_path': './mallet-2.0.8/bin/mallet',
+                             'prefix_path': './artefacts/mallet_tmp/',
+                             'prefix': 'example'
+                         })
+predict_df = predict_and_format_topics(model, corpus, data)
+```
+
+## Possible Improvements
+
+* Using other types of topic models beside LDA
+* Using bigrams and trigrams to process raw data
+* Using other metrics to measure performance of generated topics
 
 ## References
 
