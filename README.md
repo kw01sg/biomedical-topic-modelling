@@ -32,6 +32,18 @@ biomedical-topic-modelling
 └── README.md
 ```
 
+## Environment Management
+
+Python virtual environment is managed using Conda. 
+
+```bash
+$ conda env create -f environment.yml
+$ conda activate textmining
+
+# then run your python scripts or notebook
+$ jupyter notebook
+```
+
 ## References
 
 * [Intuitive Guide to Latent Dirichlet Allocation](https://towardsdatascience.com/light-on-math-machine-learning-intuitive-guide-to-latent-dirichlet-allocation-437c81220158)
