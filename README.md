@@ -4,13 +4,13 @@
 
 ```
 biomedical-topic-modelling
-├── artefacts
+├── artefacts                                       <- artefacts generated from modelling process
 ├── data
 │   ├── Associated words.xlsx
-│   ├── cordis-h2020projects.xlsx
+│   ├── cordis-h2020projects.xlsx                   <- list of projects/grants
 │   ├── Text mining word list test 200823.xlsx
 │   └── topics_300_SYinput_LW.csv
-├── mallet-2.0.8
+├── mallet-2.0.8    <- executable for LDA Mallet. Refer to Topic Modeling with Gensim (Python) in Reference
 ├── notebooks
 │   ├── bigrams.ipynb
 │   ├── EDA.ipynb
@@ -32,7 +32,9 @@ biomedical-topic-modelling
 └── README.md
 ```
 
-## Environment Management
+## Getting Started
+
+### Installation
 
 Python virtual environment is managed using Conda. 
 
@@ -42,6 +44,40 @@ $ conda activate textmining
 
 # then run your python scripts or notebook
 $ jupyter notebook
+```
+
+### Run Jupyter Notebooks
+
+Most of the experimentations are done in Jupyter Notebooks.
+
+```bash
+$ conda activate textmining
+$ jupyter notebook
+```
+
+### Training Gensim LDAMallet Model
+
+```bash
+$ python -m src.train --help
+Usage: train.py [OPTIONS]
+
+Options:
+  -i, --input TEXT          [required]
+  -n, --num_topics INTEGER  [required]
+  -s, --suffix TEXT         [required]
+  --save-model
+  --help                    Show this message and exit.
+
+$ python -m src.train --input ./data/cordis-h2020projects.xlsx --num_topics 10 --suffix temp --save-model
+```
+
+### Loading LDA Model
+
+```python
+from src.artefacts_helper import load_mallet_model
+
+model = load_mallet_model(artefacts_path='./artefacts/', suffix='temp')
+model.num_topics
 ```
 
 ## References
